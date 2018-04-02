@@ -1,0 +1,65 @@
+%& -job-name=Enonce_Sudoku
+
+\documentclass[a4paper,12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[french]{babel}
+
+\title{\textbf{Solveur Sudoku}\\Projet Informatique IN104}
+\date{}
+\author{Vollhardt Ugo - ugo.vollhardt@centralesupelec.fr}
+\begin{document}
+	\maketitle
+	\section{Présentation}
+	
+	Chaque binôme aura à implémenter entièrement un solveur de Sudoku, qui devra inclure un certain nombre d'algorithmes de base nécessaires à la résolution. \\
+	
+	Pour rappel, un Sudoku est un jeu mathématique qui consiste à remplir une grille de 9x9 cases avec des chiffres allant de 1 à 9, tout en respectant un lot de règles très simples : 
+	\begin{itemize}
+		\item Chaque chiffre ne doit figurer qu'une seule fois sur chaque ligne de la grille.
+		\item Chaque chiffre ne doit figurer qu'une seule fois sur chaque colonne de la grille.
+		\item Chaque chiffre ne doit figurer qu'une seule fois dans chacune des sous sections de 9 cases
+	\end{itemize}
+
+	Il existe de nombreux algorithmes dédiés à la résolution de tels problèmes, cependant seuls quelques uns seront présentés durant les séances de TP. Les binômes sont néanmoins encouragés à ajouter des algorithmes pour réduire le temps de calcul ou le nombre d'itérations nécessaires à la résolution d'une grille. \\
+	
+	Ce projet pourra aussi bien être développé en Python qu'en C, le choix du langage est à la discrétion du binôme. Cependant les problématiques seront légèrement différentes suivant le langage (notamment pour les structures de données utilisées), ainsi le choix est important et surtout définitif. 
+	
+	\section{Objectif}
+	L'objectif, comme présenté, est de créer de toute pièce et entièrement, un programme permettant la résolution n'importe quelle grille de Sudoku, qu'elle que soit sa difficulté. \\
+	
+	Ainsi le projet devra contenir les fonctionnalités suivantes : 
+	\begin{itemize}
+		\item Récupération de la description d'une grille de Sudoku depuis une source quelconque (Entrée utilisateur, lecture de fichier, etc.)
+		\item Stockage de la grille dans une structure de donnée adéquate, qui permet une manipulation facile.
+		\item Premier algorithme simple qui permet de résoudre les grilles de difficulté basse.
+		\item Second algorithme, qui consiste à forcer une des valeurs possibles sur une des cases lorsqu'il n'est plus possible de progresser avec l'algorithme simple.
+		\item Une interface qui permette de visualiser le contenu d'une grille (dans la console ou avec une vraie interface graphique si le temps le permet en utilisant GTK+)
+	\end{itemize} 
+
+	En complément pour les binômes qui auront le temps : 
+	\begin{itemize}
+		\item Estimation de la difficulté d'une grille;
+		\item Génération de grilles aléatoires d'une difficulté donnée;
+		\item Implémentation d'algorithmes supplémentaires pour améliorer les temps de calcul et le nombre d'itérations;
+		\item Amélioration de l'interface.
+	\end{itemize}
+	\section{Contenu prévisionnel des TPs}
+	Planning à titre indicatif (évoluera en fonction de l'avancement du groupe et des besoins): 
+	\begin{enumerate}
+		\item Création du dossier Git et implémentation de base du programme (récupération grille et algorithme simple de résolution).
+		\item Poursuite de l'implémentation de la base et ajout de l'algorithme de forçage, avec rappel des notions de récursivité si besoin.
+		\item Fin de l'implémentation des deux algorithmes de base.
+		\item Prise en main de GTK+ pour la création d'une interface graphique.
+		\item Dernières mises au point et approfondissements.
+	\end{enumerate}
+	\section{Évaluation}
+	\textbf{Atteinte des objectifs}  Pour valider le projet, chaque binôme devra avoir développé un programme contenant les fonctionnalités citées précédemment. \\
+	Ainsi chaque binôme devra avoir un programme qui soit capable de lire une grille de Sudoku, la résoudre en utilisant au moins les deux algorithmes présentés durant les séances, et intégrer l'ensemble de ces fonctionnalités au sein d'une interface graphique minimale (afficher une grille à l'écran, pas besoin de plus). \\
+	Toute amélioration sera bien entendu valorisée. \\
+	
+	\textbf{Performances \& temps de calcul}  Le but d'un solveur est de résoudre un problème de manière rapide et efficace, ainsi ces deux critères seront aussi pris en compte dans la notation. Les deux algorithmes basiques permettent de résoudre dans un temps et en un nombre d'itérations données le problème, et c'est sur cette base que les points seront attribués. \\
+	
+	\textbf{Robustesse du Code}  Il y a relativement peu de cas de bord dans la résolution d'un Sudoku, cependant il faut qu'un programme soit capable de fonctionner dans tous les cas, qu'importe ce que fait l'utilisateur avec. Ainsi il est à votre charge de vous en assurer. (Rappel de la loi de Murphy : Tout ce qui peut arriver, arrivera !) \\
+	
+	\textbf{Clarté du code \& Commentaires} Un code n'est pas seulement pour vous, mais aussi pour celui qui le lit, celui qui le maintient, celui qui passe après vous, ou même pour vous 5 ans après. Ainsi le code devra être clair et explicite, avec ce qu'il faut de commentaires pour expliquer le fonctionnement de vos fonctions et les choix d'implémentation. 
+\end{document}
