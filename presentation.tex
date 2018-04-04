@@ -1,0 +1,111 @@
+\documentclass{beamer}
+\usepackage[frenchb]{babel}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usetheme{CambridgeUS}
+\usepackage{tikz}
+\usepackage{listings}
+\lstset { %
+	language=bash,
+	backgroundcolor=\color{black!5}, % set backgroundcolor
+	basicstyle=\footnotesize,% basic font setting
+}
+
+\title{IN104 - Solveur de Sudoku}
+\author{Ugo Vollhardt}
+\institute{CEA LIST}
+
+\begin{document}
+	\section{Rappels Git}
+	\begin{frame}
+	\frametitle{L'espace de travail}
+	%\framesubtitle{avec un exemple de sous-titre}
+	\begin{center}
+	\begin{tikzpicture}
+		\coordinate (lu1) at (0,3);
+		\coordinate (lu2) at (4,3);
+		\coordinate (lu3) at (8,3);
+		\coordinate (rb1) at (3,0);
+		\coordinate (rb2) at (7,0);
+		\coordinate (rb3) at (11,0);
+		\fill[color=gray!20] (lu1) rectangle (rb1);
+		\draw (lu1) rectangle (rb1);
+		\draw (lu1) node[below right]{\footnotesize Dêpot local};
+		\fill[color=gray!20] (lu2) rectangle (rb2);
+		\draw (lu2) rectangle (rb2);
+		\draw (lu2) node[below right]{\footnotesize Staging area};
+		\fill[color=gray!20] (lu3) rectangle (rb3);
+		\draw (lu3) rectangle (rb3);
+		\draw (lu3) node[below right]{\footnotesize Répertoire de travail};
+		\draw[dashed] (7.5,-2) -- (7.5,5);
+		\draw[->,>=latex] (9,0) to[bend left] (6,0);
+		\draw (3.5,-0.5) node[below]{\footnotesize git commit};
+		\draw[->,>=latex] (5,0) to[bend left] (2,0);
+		\draw (7.5,-0.5) node[below]{\footnotesize git add};
+		\draw[->,>=latex] (2,3) to[bend left] (9,3);
+		\draw (5.5,4) node[below]{\footnotesize git checkout};
+		\draw[->,>=latex] (6,3) to[bend left] (9,3);
+		\draw (7.5,3.5) node[below]{\footnotesize git reset};
+		\draw (7.5,5) node[below right]{Visible par l'utilisateur};
+		\draw (7.5,5) node[below left]{Caché par Git};
+	\end{tikzpicture}	
+	\end{center}
+	\end{frame}
+\begin{frame}
+\frametitle{Contenu du dêpot local : Historique des commits}
+\begin{columns}[c]
+	\begin{column}{5cm}
+		\begin{center}
+			\begin{tikzpicture}
+			\node[draw,circle,fill=gray!20] (c1) at (0,0) {c1};
+			\node[draw,circle,fill=gray!20] (c2) at (1,1.5) {c2};
+			\node[draw,circle,fill=gray!20] (c3) at (-1,1.5) {c3};
+			\node[draw,circle,fill=gray!20] (c4) at (1,3) {c4};
+			\node[draw,circle,fill=gray!20] (c5) at (1,4.5) {c5};
+			\draw[->,>=latex] (c1) to[out=90, in=-90] (c2);
+			\draw[->,>=latex] (c1) to[out=90, in=-90] (c3);
+			\draw[->,>=latex] (c2) to[out=90, in=-90] (c4);
+			\draw[->,>=latex] (c4) to[out=90, in=-90] (c5);
+			\end{tikzpicture}
+		\end{center}
+	\end{column}
+	\begin{column}{5cm}
+		Contenu d'un commit : 
+		\begin{itemize}
+			\item Un nom
+			\item Une description
+			\item Une liste de modifications
+			\item Un parent
+		\end{itemize}
+	\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Création d'un commit}
+	{\bfseries \$ git add <file> }: Ajoute les modifications faites sur un fichier à la staging area \\
+	{\bfseries \$ git commit -m "message"} : Forme un commit qui contiendra l'ensemble des modification présentes dans la staging area
+\end{frame}
+
+\begin{frame}
+\frametitle{Se déplacer dans l'historique : Les pointeurs}
+\begin{center}
+	\begin{tikzpicture}
+	\node[draw,circle,fill=gray!20] (c1) at (0,0) {c1};
+	\node[draw,circle,fill=gray!20] (c2) at (1,1.5) {c2};
+	\node[draw,circle,fill=gray!20] (c3) at (-1,1.5) {c3};
+	\node[draw,circle,fill=gray!20] (c4) at (1,3) {c4};
+	\node[draw,circle,fill=gray!20] (c5) at (1,4.5) {c5};
+	\node[draw,rectangle,fill=gray!20] (HEAD) at (2.5,5) {HEAD};
+	\node[draw,rectangle,fill=gray!20] (Master) at (2.5,4) {Master};
+	\draw[->,>=latex] (c1) to[out=90, in=-90] (c2);
+	\draw[->,>=latex] (c1) to[out=90, in=-90] (c3);
+	\draw[->,>=latex] (c2) to[out=90, in=-90] (c4);
+	\draw[->,>=latex] (c4) to[out=90, in=-90] (c5);
+	\draw[->,>=latex] (HEAD) to[out=180, in=90] (c5);
+	\draw[->,>=latex] (Master) to[out=180, in=0] (c5);
+	\end{tikzpicture}
+\end{center}
+\end{frame}
+
+\end{document}\documentclass{beamer}
