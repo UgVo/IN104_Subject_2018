@@ -1,0 +1,479 @@
+%& --output-directory=../../pdf/
+
+\documentclass{beamer}
+\usepackage[frenchb]{babel}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usetheme{CambridgeUS}
+\usepackage{tikz}
+\usepackage{listings}
+\usepackage{verbatim}
+\usepackage{hyperref}
+\usepackage{ulem}
+
+\usetikzlibrary{arrows,shapes}
+\lstset { %
+	language=bash,
+	backgroundcolor=\color{black!5}, % set backgroundcolor
+	basicstyle=\footnotesize,% basic font setting
+}
+
+\title{IN104 - Solveur de Sudoku}
+\author{Ugo Vollhardt}
+\institute{CEA LIST}
+
+\begin{document}
+	\maketitle
+	\section{Planning}
+	\begin{frame}
+	Déroulement prévisionnel : 
+	\setbeamertemplate{enumerate items}[default]
+	\begin{enumerate}
+		\item Rappels sur Git, mise en place versionnement, structure donnée et premières fonctions de mises à jours de possibilités.
+		\item Rappels/introduction à la notion de récursivité, poursuite du travail de la première séance et mise en place des premiers algo de résolution.
+		\item Fin d'implémentation des permiers algo de résolution + rappels sur sujet au choix.
+		\item Introduction à la librairie GTK+ pour Python et C, implémentation d'une interface minimale.
+		\item Séance en autonomie.
+		\item Revu des points précédents et approfondissement si besoin.
+	\end{enumerate}
+	\end{frame}
+	\section{Projet Gitlab}
+	\begin{frame}
+	\frametitle{Pour Commencer : Mise en place du versionnement de code}
+		\begin{itemize}
+			\item Création d'un projet sur GitLab par l'un des deux membres du binôme.
+			\item Ajout du fichier .gitignore correspondant au langage choisi
+			\item Ajout du second membre du binôme en tant que master sur le projet GitLab
+			\item Ajouter votre encadrant au projet avec les droits de développeur au moins (pseudo : UgoVollhardt)
+			\item Vérifier que tous le monde a bien mis en place sa clef SSH
+			\item Clonage du projet en local sur les ordinateurs de chacun
+		\end{itemize}
+	\end{frame}
+	\section{Implémentation basique}
+	\begin{frame}
+	\frametitle{Grille de Sudoku : fonctionnement}
+	\begin{columns}[c]
+		\begin{column}{5cm}
+			\begin{center}
+				\begin{tikzpicture}[scale=0.5]
+					\draw[step=1,black,thin,xshift=-0.5cm,yshift=-0.5cm] (0,0) grid (9,9);
+					\draw[step=3,black,thick,xshift=-0.5cm,yshift=-0.5cm] (0,0) grid (9,9);
+					\draw (2,0) node[]{7};
+					\draw (2,1) node[]{5};
+					\draw (0,1) node[]{2};
+					\draw (0,2) node[]{6};
+					\draw (1,2) node[]{1};
+					\draw (3,0) node[]{6};
+					\draw (4,1) node[]{7};
+					\draw (4,2) node[]{4};
+					\draw (3,2) node[]{8};
+					\draw (3,0) node[]{6};
+					\draw (6,0) node[]{8};
+					\draw (7,0) node[]{9};
+					\draw (7,1) node[]{6};
+					\draw (8,1) node[]{1};
+					\draw (8,4) node[]{2};
+					\draw (7,4) node[]{5};
+					\draw (6,5) node[]{6};
+					\draw (5,5) node[]{8};
+					\draw (4,5) node[]{5};
+					\draw (4,4) node[]{3};
+					\draw (4,3) node[]{9};
+					\draw (3,3) node[]{2};
+					\draw (2,3) node[]{3};
+					\draw (1,4) node[]{4};
+					\draw (0,4) node[]{8};
+					\draw (0,7) node[]{1};
+					\draw (1,7) node[]{5};
+					\draw (1,8) node[]{9};
+					\draw (2,8) node[]{2};
+					\draw (5,8) node[]{4};
+					\draw (4,7) node[]{6};
+					\draw (4,6) node[]{1};
+					\draw (5,6) node[]{2};
+					\draw (6,8) node[]{7};
+					\draw (6,7) node[]{2};
+					\draw (7,6) node[]{4};
+					\draw (8,6) node[]{9};
+					\draw (8,7) node[]{8};
+				\end{tikzpicture}
+			\end{center}
+		\end{column}
+		\begin{column}{5cm}
+		\end{column}
+	\end{columns}
+	\end{frame}
+
+\begin{frame}
+\frametitle{Grille de Sudoku : fonctionnement}
+\begin{columns}[c]
+	\begin{column}{5cm}
+		\begin{center}
+			\begin{tikzpicture}[scale=0.5]
+			\fill[red!50,thick] (4.5,4.5) rectangle (5.5,3.5);
+			\draw[step=1,black,thin,xshift=-0.5cm,yshift=-0.5cm] (0,0) grid (9,9);
+			\draw[step=3,black,thick,xshift=-0.5cm,yshift=-0.5cm] (0,0) grid (9,9);
+			\draw (2,0) node[]{7};
+			\draw (2,1) node[]{5};
+			\draw (0,1) node[]{2};
+			\draw (0,2) node[]{6};
+			\draw (1,2) node[]{1};
+			\draw (3,0) node[]{6};
+			\draw (4,1) node[]{7};
+			\draw (4,2) node[]{4};
+			\draw (3,2) node[]{8};
+			\draw (3,0) node[]{6};
+			\draw (6,0) node[]{8};
+			\draw (7,0) node[]{9};
+			\draw (7,1) node[]{6};
+			\draw (8,1) node[]{1};
+			\draw (8,4) node[]{2};
+			\draw (7,4) node[]{5};
+			\draw (6,5) node[]{6};
+			\draw (5,5) node[]{8};
+			\draw (4,5) node[]{5};
+			\draw (4,4) node[]{3};
+			\draw (4,3) node[]{9};
+			\draw (3,3) node[]{2};
+			\draw (2,3) node[]{3};
+			\draw (1,4) node[]{4};
+			\draw (0,4) node[]{8};
+			\draw (0,7) node[]{1};
+			\draw (1,7) node[]{5};
+			\draw (1,8) node[]{9};
+			\draw (2,8) node[]{2};
+			\draw (5,8) node[]{4};
+			\draw (4,7) node[]{6};
+			\draw (4,6) node[]{1};
+			\draw (5,6) node[]{2};
+			\draw (6,8) node[]{7};
+			\draw (6,7) node[]{2};
+			\draw (7,6) node[]{4};
+			\draw (8,6) node[]{9};
+			\draw (8,7) node[]{8};
+			
+			\end{tikzpicture}
+		\end{center}
+	\end{column}
+	\begin{column}{5cm}
+	\end{column}
+\end{columns}
+\end{frame}
+
+	\begin{frame}
+	\frametitle{Grille de Sudoku : fonctionnement}
+	\begin{columns}[c]
+		\begin{column}{5cm}
+			\begin{center}
+				\begin{tikzpicture}[scale=0.5]
+				\draw[step=1,black,thin,xshift=-0.5cm,yshift=-0.5cm] (0,0) grid (9,9);
+				\draw[step=3,black,thick,xshift=-0.5cm,yshift=-0.5cm] (0,0) grid (9,9);
+				\draw (2,0) node[]{7};
+				\draw (2,1) node[]{5};
+				\draw (0,1) node[]{2};
+				\draw (0,2) node[]{6};
+				\draw (1,2) node[]{1};
+				\draw (3,0) node[]{6};
+				\draw (4,1) node[]{7};
+				\draw (4,2) node[]{4};
+				\draw (3,2) node[]{8};
+				\draw (3,0) node[]{6};
+				\draw (6,0) node[]{8};
+				\draw (7,0) node[]{9};
+				\draw (7,1) node[]{6};
+				\draw (8,1) node[]{1};
+				\draw (8,4) node[]{2};
+				\draw (7,4) node[]{5};
+				\draw (6,5) node[]{6};
+				\draw (5,5) node[]{8};
+				\draw (4,5) node[]{5};
+				\draw (4,4) node[]{3};
+				\draw (4,3) node[]{9};
+				\draw (3,3) node[]{2};
+				\draw (2,3) node[]{3};
+				\draw (1,4) node[]{4};
+				\draw (0,4) node[]{8};
+				\draw (0,7) node[]{1};
+				\draw (1,7) node[]{5};
+				\draw (1,8) node[]{9};
+				\draw (2,8) node[]{2};
+				\draw (5,8) node[]{4};
+				\draw (4,7) node[]{6};
+				\draw (4,6) node[]{1};
+				\draw (5,6) node[]{2};
+				\draw (6,8) node[]{7};
+				\draw (6,7) node[]{2};
+				\draw (7,6) node[]{4};
+				\draw (8,6) node[]{9};
+				\draw (8,7) node[]{8};
+				\fill[red!50,thick] (4.5,4.5) rectangle (5.5,3.5);
+				\draw[color=blue!50,very thick] (-0.5,4.5) rectangle (8.5,3.5);
+				%\draw[color=cyan!50,very thick] (4.5,8.5) rectangle (5.5,-0.5);
+				%\draw[color=orange!50,very thick] (2.5,5.5) rectangle (5.5,2.5);
+				
+				\end{tikzpicture}
+			\end{center}
+		\end{column}
+		\begin{column}{5cm}
+			\begin{tikzpicture}[scale=0.5]
+			%\draw[step=1,black,thin,xshift=-0.5cm,yshift=-0.5cm] (0,-1) grid (9,0);
+			%\foreach \x in {1,6,7} {\draw (\x-1,-1) node[]{\x};}
+			
+			\draw[step=1,color=blue!50,thick,xshift=-0.5cm,yshift=-0.5cm] (0,2) grid (9,3);
+			\foreach \x in {1,6,7,9} {\draw (\x-1,2) node[]{\x};}
+			\foreach \x in {2,5,3,4,8} {\draw (\x-1,2) node[]{\xout{\x}};}
+			
+			%\draw[step=1,color=cyan!50,thick,xshift=-0.5cm,yshift=-0.5cm] (0,4) grid (9,5);
+			%\foreach \x in {1,3,5,6,7,9} {\draw (\x-1,4) node[]{\x};}
+			%\foreach \x in {2,4,8} {\draw (\x-1,4) node[]{\xout{\x}};}
+			
+			%\draw[step=1,color=orange!50,thick,xshift=-0.5cm,yshift=-0.5cm] (0,6) grid (9,7);
+			%\foreach \x in {1,4,6,7} {\draw (\x-1,6) node[]{\x};}
+			%\foreach \x in {2,3,5,8,9} {\draw (\x-1,6) node[]{\xout{\x}};}
+			\end{tikzpicture}
+		\end{column}
+	\end{columns}
+	\end{frame}
+
+	\begin{frame}
+	\frametitle{Grille de Sudoku : fonctionnement}
+	\begin{columns}[c]
+		\begin{column}{5cm}
+			\begin{center}
+				\begin{tikzpicture}[scale=0.5]
+				\draw[step=1,black,thin,xshift=-0.5cm,yshift=-0.5cm] (0,0) grid (9,9);
+				\draw[step=3,black,thick,xshift=-0.5cm,yshift=-0.5cm] (0,0) grid (9,9);
+				\draw (2,0) node[]{7};
+				\draw (2,1) node[]{5};
+				\draw (0,1) node[]{2};
+				\draw (0,2) node[]{6};
+				\draw (1,2) node[]{1};
+				\draw (3,0) node[]{6};
+				\draw (4,1) node[]{7};
+				\draw (4,2) node[]{4};
+				\draw (3,2) node[]{8};
+				\draw (3,0) node[]{6};
+				\draw (6,0) node[]{8};
+				\draw (7,0) node[]{9};
+				\draw (7,1) node[]{6};
+				\draw (8,1) node[]{1};
+				\draw (8,4) node[]{2};
+				\draw (7,4) node[]{5};
+				\draw (6,5) node[]{6};
+				\draw (5,5) node[]{8};
+				\draw (4,5) node[]{5};
+				\draw (4,4) node[]{3};
+				\draw (4,3) node[]{9};
+				\draw (3,3) node[]{2};
+				\draw (2,3) node[]{3};
+				\draw (1,4) node[]{4};
+				\draw (0,4) node[]{8};
+				\draw (0,7) node[]{1};
+				\draw (1,7) node[]{5};
+				\draw (1,8) node[]{9};
+				\draw (2,8) node[]{2};
+				\draw (5,8) node[]{4};
+				\draw (4,7) node[]{6};
+				\draw (4,6) node[]{1};
+				\draw (5,6) node[]{2};
+				\draw (6,8) node[]{7};
+				\draw (6,7) node[]{2};
+				\draw (7,6) node[]{4};
+				\draw (8,6) node[]{9};
+				\draw (8,7) node[]{8};
+				\fill[red!50,thick] (4.5,4.5) rectangle (5.5,3.5);
+				\draw[color=blue!50,very thick] (-0.5,4.5) rectangle (8.5,3.5);
+				\draw[color=cyan!50,very thick] (4.5,8.5) rectangle (5.5,-0.5);
+				%\draw[color=orange!50,very thick] (2.5,5.5) rectangle (5.5,2.5);
+				
+				\end{tikzpicture}
+			\end{center}
+		\end{column}
+		\begin{column}{5cm}
+			\begin{tikzpicture}[scale=0.5]
+			%\draw[step=1,black,thin,xshift=-0.5cm,yshift=-0.5cm] (0,-1) grid (9,0);
+			%\foreach \x in {1,6,7} {\draw (\x-1,-1) node[]{\x};}
+			
+			\draw[step=1,color=blue!50,thick,xshift=-0.5cm,yshift=-0.5cm] (0,2) grid (9,3);
+			\foreach \x in {1,6,7,9} {\draw (\x-1,2) node[]{\x};}
+			\foreach \x in {2,5,3,4,8} {\draw (\x-1,2) node[]{\xout{\x}};}
+			
+			\draw[step=1,color=cyan!50,thick,xshift=-0.5cm,yshift=-0.5cm] (0,4) grid (9,5);
+			\foreach \x in {1,3,5,6,7,9} {\draw (\x-1,4) node[]{\x};}
+			\foreach \x in {2,4,8} {\draw (\x-1,4) node[]{\xout{\x}};}
+			
+			%\draw[step=1,color=orange!50,thick,xshift=-0.5cm,yshift=-0.5cm] (0,6) grid (9,7);
+			%\foreach \x in {1,4,6,7} {\draw (\x-1,6) node[]{\x};}
+			%\foreach \x in {2,3,5,8,9} {\draw (\x-1,6) node[]{\xout{\x}};}
+			\end{tikzpicture}
+		\end{column}
+	\end{columns}
+	\end{frame}
+
+	\begin{frame}
+	\frametitle{Grille de Sudoku : fonctionnement}
+	\begin{columns}[c]
+		\begin{column}{5cm}
+			\begin{center}
+				\begin{tikzpicture}[scale=0.5]
+				\draw[step=1,black,thin,xshift=-0.5cm,yshift=-0.5cm] (0,0) grid (9,9);
+				\draw[step=3,black,thick,xshift=-0.5cm,yshift=-0.5cm] (0,0) grid (9,9);
+				\draw (2,0) node[]{7};
+				\draw (2,1) node[]{5};
+				\draw (0,1) node[]{2};
+				\draw (0,2) node[]{6};
+				\draw (1,2) node[]{1};
+				\draw (3,0) node[]{6};
+				\draw (4,1) node[]{7};
+				\draw (4,2) node[]{4};
+				\draw (3,2) node[]{8};
+				\draw (3,0) node[]{6};
+				\draw (6,0) node[]{8};
+				\draw (7,0) node[]{9};
+				\draw (7,1) node[]{6};
+				\draw (8,1) node[]{1};
+				\draw (8,4) node[]{2};
+				\draw (7,4) node[]{5};
+				\draw (6,5) node[]{6};
+				\draw (5,5) node[]{8};
+				\draw (4,5) node[]{5};
+				\draw (4,4) node[]{3};
+				\draw (4,3) node[]{9};
+				\draw (3,3) node[]{2};
+				\draw (2,3) node[]{3};
+				\draw (1,4) node[]{4};
+				\draw (0,4) node[]{8};
+				\draw (0,7) node[]{1};
+				\draw (1,7) node[]{5};
+				\draw (1,8) node[]{9};
+				\draw (2,8) node[]{2};
+				\draw (5,8) node[]{4};
+				\draw (4,7) node[]{6};
+				\draw (4,6) node[]{1};
+				\draw (5,6) node[]{2};
+				\draw (6,8) node[]{7};
+				\draw (6,7) node[]{2};
+				\draw (7,6) node[]{4};
+				\draw (8,6) node[]{9};
+				\draw (8,7) node[]{8};
+				\fill[red!50,thick] (4.5,4.5) rectangle (5.5,3.5);
+				\draw[color=blue!50,very thick] (-0.5,4.5) rectangle (8.5,3.5);
+				\draw[color=cyan!50,very thick] (4.5,8.5) rectangle (5.5,-0.5);
+				\draw[color=orange!50,very thick] (2.5,5.5) rectangle (5.5,2.5);
+				
+				\end{tikzpicture}
+			\end{center}
+		\end{column}
+		\begin{column}{5cm}
+			\begin{tikzpicture}[scale=0.5]
+			%\draw[step=1,black,thin,xshift=-0.5cm,yshift=-0.5cm] (0,-1) grid (9,0);
+			%\foreach \x in {1,6,7} {\draw (\x-1,-1) node[]{\x};}
+			
+			\draw[step=1,color=blue!50,thick,xshift=-0.5cm,yshift=-0.5cm] (0,2) grid (9,3);
+			\foreach \x in {1,6,7,9} {\draw (\x-1,2) node[]{\x};}
+			\foreach \x in {2,5,3,4,8} {\draw (\x-1,2) node[]{\xout{\x}};}
+			
+			\draw[step=1,color=cyan!50,thick,xshift=-0.5cm,yshift=-0.5cm] (0,4) grid (9,5);
+			\foreach \x in {1,3,5,6,7,9} {\draw (\x-1,4) node[]{\x};}
+			\foreach \x in {2,4,8} {\draw (\x-1,4) node[]{\xout{\x}};}
+			
+			\draw[step=1,color=orange!50,thick,xshift=-0.5cm,yshift=-0.5cm] (0,6) grid (9,7);
+			\foreach \x in {1,4,6,7} {\draw (\x-1,6) node[]{\x};}
+			\foreach \x in {2,3,5,8,9} {\draw (\x-1,6) node[]{\xout{\x}};}
+			\end{tikzpicture}
+		\end{column}
+	\end{columns}
+	\end{frame}
+
+	\begin{frame}
+	\frametitle{Grille de Sudoku : fonctionnement}
+		\begin{columns}[c]
+			\begin{column}{5cm}
+				\begin{center}
+					\begin{tikzpicture}[scale=0.5]
+					\draw[step=1,black,thin,xshift=-0.5cm,yshift=-0.5cm] (0,0) grid (9,9);
+					\draw[step=3,black,thick,xshift=-0.5cm,yshift=-0.5cm] (0,0) grid (9,9);
+					\draw (2,0) node[]{7};
+					\draw (2,1) node[]{5};
+					\draw (0,1) node[]{2};
+					\draw (0,2) node[]{6};
+					\draw (1,2) node[]{1};
+					\draw (3,0) node[]{6};
+					\draw (4,1) node[]{7};
+					\draw (4,2) node[]{4};
+					\draw (3,2) node[]{8};
+					\draw (3,0) node[]{6};
+					\draw (6,0) node[]{8};
+					\draw (7,0) node[]{9};
+					\draw (7,1) node[]{6};
+					\draw (8,1) node[]{1};
+					\draw (8,4) node[]{2};
+					\draw (7,4) node[]{5};
+					\draw (6,5) node[]{6};
+					\draw (5,5) node[]{8};
+					\draw (4,5) node[]{5};
+					\draw (4,4) node[]{3};
+					\draw (4,3) node[]{9};
+					\draw (3,3) node[]{2};
+					\draw (2,3) node[]{3};
+					\draw (1,4) node[]{4};
+					\draw (0,4) node[]{8};
+					\draw (0,7) node[]{1};
+					\draw (1,7) node[]{5};
+					\draw (1,8) node[]{9};
+					\draw (2,8) node[]{2};
+					\draw (5,8) node[]{4};
+					\draw (4,7) node[]{6};
+					\draw (4,6) node[]{1};
+					\draw (5,6) node[]{2};
+					\draw (6,8) node[]{7};
+					\draw (6,7) node[]{2};
+					\draw (7,6) node[]{4};
+					\draw (8,6) node[]{9};
+					\draw (8,7) node[]{8};
+					\fill[red!50,thick] (4.5,4.5) rectangle (5.5,3.5);
+					\draw[color=blue!50,very thick] (-0.5,4.5) rectangle (8.5,3.5);
+					\draw[color=cyan!50,very thick] (4.5,8.5) rectangle (5.5,-0.5);
+					\draw[color=orange!50,very thick] (2.5,5.5) rectangle (5.5,2.5);
+					
+					\end{tikzpicture}
+				\end{center}
+			\end{column}
+			\begin{column}{5cm}
+				\begin{tikzpicture}[scale=0.5]
+				\draw[step=1,black,thin,xshift=-0.5cm,yshift=-0.5cm] (0,-1) grid (9,0);
+				\foreach \x in {1,6,7} {\draw (\x-1,-1) node[]{\x};}
+				
+				\draw[step=1,color=blue!50,thick,xshift=-0.5cm,yshift=-0.5cm] (0,2) grid (9,3);
+				\foreach \x in {1,6,7,9} {\draw (\x-1,2) node[]{\x};}
+				\foreach \x in {2,5,3,4,8} {\draw (\x-1,2) node[]{\xout{\x}};}
+				
+				\draw[step=1,color=cyan!50,thick,xshift=-0.5cm,yshift=-0.5cm] (0,4) grid (9,5);
+				\foreach \x in {1,3,5,6,7,9} {\draw (\x-1,4) node[]{\x};}
+				\foreach \x in {2,4,8} {\draw (\x-1,4) node[]{\xout{\x}};}
+				
+				\draw[step=1,color=orange!50,thick,xshift=-0.5cm,yshift=-0.5cm] (0,6) grid (9,7);
+				\foreach \x in {1,4,6,7} {\draw (\x-1,6) node[]{\x};}
+				\foreach \x in {2,3,5,8,9} {\draw (\x-1,6) node[]{\xout{\x}};}
+				\end{tikzpicture}
+			\end{column}
+		\end{columns}
+	\end{frame}
+	\section{Objectifs}
+	\begin{frame}
+	\frametitle{Objectifs de la séance}
+	\setbeamertemplate{enumerate items}[default]
+	\begin{enumerate}
+		\item Choisir et implémenter les structures de données (représentation de la grille de Sudoku et des possibilités pour chaque cases)
+		\item Avoir un affichage minimal dans le terminal d'une grille
+		\item Coder les fonctions pour mettre à jour les possibilités pour chaque cases.
+		\begin{itemize}
+			\item Possibilités sur la colonne
+			\item Possibilités sur la ligne
+			\item Possibilités dans le carré
+			\item Intersection de ces trois ensembles
+		\end{itemize}
+	\end{enumerate}
+\end{frame}
+
+\end{document}
