@@ -1,0 +1,293 @@
+%& --output-directory=../../pdf/
+
+\documentclass{beamer}
+\usepackage[frenchb]{babel}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usetheme{CambridgeUS}
+\usepackage{tikz}
+\usepackage{listings}
+\usepackage{verbatim}
+\usepackage{hyperref}
+
+\usetikzlibrary{arrows,shapes}
+\lstset { %
+	language=bash,
+	backgroundcolor=\color{black!5}, % set backgroundcolor
+	basicstyle=\footnotesize,% basic font setting
+}
+
+\title{IN104 - Solveur de Sudoku}
+\author{Ugo Vollhardt}
+\institute{CEA LIST}
+
+\begin{document}
+	\pgfdeclarelayer{background}
+	\pgfsetlayers{background,main}
+	\section{Rappels Git}
+	\begin{frame}
+	\frametitle{L'espace de travail}
+	\begin{center}
+	\begin{tikzpicture}
+		\coordinate (lu1) at (0,3);
+		\coordinate (lu2) at (4,3);
+		\coordinate (lu3) at (8,3);
+		\coordinate (rb1) at (3,0);
+		\coordinate (rb2) at (7,0);
+		\coordinate (rb3) at (11,0);
+		\fill[color=gray!20] (lu1) rectangle (rb1);
+		\draw (lu1) rectangle (rb1);
+		\draw (lu1) node[below right]{\footnotesize Depôt local};
+		\fill[color=gray!20] (lu2) rectangle (rb2);
+		\draw (lu2) rectangle (rb2);
+		\draw (lu2) node[below right]{\footnotesize Staging area};
+		\fill[color=gray!20] (lu3) rectangle (rb3);
+		\draw (lu3) rectangle (rb3);
+		\draw (lu3) node[below right]{\footnotesize Répertoire de travail};
+		\draw[dashed] (7.5,-2) -- (7.5,5);
+		\draw[->,>=latex] (9,0) to[bend left] (6,0);
+		\draw (3.5,-0.5) node[below]{\footnotesize git commit};
+		\draw[->,>=latex] (5,0) to[bend left] (2,0);
+		\draw (7.5,-0.5) node[below]{\footnotesize git add};
+		\draw[->,>=latex] (2,3) to[bend left] (9,3);
+		\draw (5.5,4) node[below]{\footnotesize git checkout};
+		\draw[->,>=latex] (6,3) to[bend left] (9,3);
+		\draw (7.5,3.5) node[below]{\footnotesize git reset};
+		\draw (7.5,5) node[below right]{Visible par l'utilisateur};
+		\draw (7.5,5) node[below left]{Caché par Git};
+	\end{tikzpicture}	
+	\end{center}
+	\end{frame}
+
+
+\begin{frame}
+	\frametitle{Les Commits}
+	Contenu d'un commit : 
+	\begin{itemize}
+		\item Un nom
+		\item Une description
+		\item Une liste de modifications
+		\item Un parent
+	\end{itemize}
+	Création d'un Commit :
+	\begin{itemize}
+		\item {\bfseries \$ git status }: Affiche le status actuel du répertoire de travail (fichiers modifiés, ajoutés ou supprimés)
+		\item {\bfseries \$ git add <file> }: Ajoute les modifications faites sur un fichier à la staging area. \\
+		\item {\bfseries \$ git commit -m "Description"} : Forme un commit qui contiendra l'ensemble des modification présentes dans la staging area.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Contenu du depôt local : Historique des commits}
+\begin{center}
+	\begin{columns}[c]
+		\begin{column}{5cm}
+			\begin{center}
+				\begin{tikzpicture}
+				\node[draw,circle,fill=gray!20] (c1) at (0,0) {c1};
+				\node[draw,circle,fill=gray!20] (c2) at (2,1.5) {c2};
+				\node[draw,circle,fill=gray!20] (c3) at (0,1.5) {c3};
+				\node[draw,circle,fill=gray!20] (c4) at (0,3) {c4};
+				\node[draw,circle,fill=gray!20] (c5) at (0,4.5) {c5};
+				\draw[->,>=latex] (c1) to[out=90, in=-90] (c2);
+				\draw[->,>=latex] (c1) to[out=90, in=-90] (c3);
+				\draw[->,>=latex] (c3) to[out=90, in=-90] (c4);
+				\draw[->,>=latex] (c4) to[out=90, in=-90] (c5);
+				\node[draw,rectangle,fill=gray!50] (Branch) at (2,3) {Branch\_1};
+				\node[draw,rectangle,fill=gray!50] (HEAD) at (1.5,5.5) {HEAD};
+				\node[draw,rectangle,fill=gray!50] (Master) at (1.5,4.5) {Master};
+				\draw[->,>=latex] (HEAD) to[out=-90, in=90] (Master);
+				\draw[->,>=latex] (Master) to[out=180, in=0] (c5);
+				\draw[->,>=latex] (Branch) to[out=-90, in=90] (c2);
+				\end{tikzpicture}
+			\end{center}
+		\end{column}
+		\begin{column}{5cm}
+		\end{column}
+	\end{columns}
+\end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{Contenu du depôt local : Historique des commits}
+\begin{columns}[c]
+	\begin{column}{5cm}
+		\begin{center}
+			\begin{tikzpicture}
+			\node[draw,circle,fill=gray!20] (c1) at (0,0) {c1};
+			\node[draw,circle,fill=gray!20] (c2) at (2,1.5) {c2};
+			\node[draw,circle,fill=gray!20] (c3) at (0,1.5) {c3};
+			\node[draw,circle,fill=gray!20] (c4) at (0,3) {c4};
+			\node[draw,circle,fill=gray!20] (c5) at (0,4.5) {c5};
+			\draw[->,>=latex] (c1) to[out=90, in=-90] (c2);
+			\draw[->,>=latex] (c1) to[out=90, in=-90] (c3);
+			\draw[->,>=latex] (c3) to[out=90, in=-90] (c4);
+			\draw[->,>=latex] (c4) to[out=90, in=-90] (c5);
+			\node[draw,rectangle,fill=gray!50] (Branch) at (2,3) {Branch\_1};
+			\node[draw,rectangle,fill=gray!50] (HEAD) at (-1.5,1.5) {HEAD};
+			\node[draw,rectangle,fill=gray!50] (Master) at (1.5,4.5) {Master};
+			\draw[->,>=latex] (HEAD) to[out=0, in=180] (c3);
+			\draw[->,>=latex] (Master) to[out=180, in=0] (c5);
+			\draw[->,>=latex] (Branch) to[out=-90, in=90] (c2);
+			\end{tikzpicture}
+		\end{center}
+	\end{column}
+	\begin{column}{5cm}
+		\$ git checkout c3
+	\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}
+\frametitle{Contenu du depôt local : Historique des commits}
+\begin{columns}[c]
+	\begin{column}{5cm}
+		\begin{center}
+			\begin{tikzpicture}
+			\node[draw,circle,fill=gray!20] (c1) at (0,0) {c1};
+			\node[draw,circle,fill=gray!20] (c2) at (2,1.5) {c2};
+			\node[draw,circle,fill=gray!20] (c3) at (0,1.5) {c3};
+			\node[draw,circle,fill=gray!20] (c4) at (0,3) {c4};
+			\node[draw,circle,fill=gray!20] (c5) at (0,4.5) {c5};
+			\draw[->,>=latex] (c1) to[out=90, in=-90] (c2);
+			\draw[->,>=latex] (c1) to[out=90, in=-90] (c3);
+			\draw[->,>=latex] (c3) to[out=90, in=-90] (c4);
+			\draw[->,>=latex] (c4) to[out=90, in=-90] (c5);
+			\node[draw,rectangle,fill=gray!50] (Branch) at (2,3) {Branch\_1};
+			\node[draw,rectangle,fill=gray!50] (HEAD) at (4,3) {HEAD};
+			\node[draw,rectangle,fill=gray!50] (Master) at (1.5,4.5) {Master};
+			\draw[->,>=latex] (HEAD) to[out=180, in=0] (Branch);
+			\draw[->,>=latex] (Master) to[out=180, in=0] (c5);
+			\draw[->,>=latex] (Branch) to[out=-90, in=90] (c2);
+			\end{tikzpicture}
+		\end{center}
+	\end{column}
+	\begin{column}{5cm}
+		\$ git checkout c3 \\
+		\$ git checkout Branch\_1 \\
+	\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}
+\frametitle{Contenu du depôt local : Historique des commits}
+\begin{columns}[c]
+	\begin{column}{5cm}
+		\begin{center}
+			\begin{tikzpicture}
+			\node[draw,circle,fill=gray!20] (c1) at (0,0) {c1};
+			\node[draw,circle,fill=gray!20] (c2) at (2,1.5) {c2};
+			\node[draw,circle,fill=gray!20] (c3) at (0,1.5) {c3};
+			\node[draw,circle,fill=gray!20] (c4) at (0,3) {c4};
+			\node[draw,circle,fill=gray!20] (c5) at (0,4.5) {c5};
+			\draw[->,>=latex] (c1) to[out=90, in=-90] (c2);
+			\draw[->,>=latex] (c1) to[out=90, in=-90] (c3);
+			\draw[->,>=latex] (c3) to[out=90, in=-90] (c4);
+			\draw[->,>=latex] (c4) to[out=90, in=-90] (c5);
+			\node[draw,rectangle,fill=gray!50] (Branch) at (2,3) {Branch\_1};
+			\node[draw,rectangle,fill=gray!50] (HEAD) at (1.5,5.5) {HEAD};
+			\node[draw,rectangle,fill=gray!50] (Master) at (1.5,4.5) {Master};
+			\draw[->,>=latex] (HEAD) to[out=-90, in=90] (Master);
+			\draw[->,>=latex] (Master) to[out=180, in=0] (c5);
+			\draw[->,>=latex] (Branch) to[out=-90, in=90] (c2);
+			\end{tikzpicture}
+		\end{center}
+	\end{column}
+	\begin{column}{5cm}
+		\$ git checkout c3 \\
+		\$ git checkout Branch\_1 \\
+		\$ git checkout master \\
+	\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}
+\begin{columns}[c]
+	\begin{column}{5cm}
+		\begin{center}
+			\begin{tikzpicture}
+			\node[draw,circle,fill=gray!20] (c1) at (0,0) {c1};
+			\node[draw,circle,fill=gray!20] (c2) at (2,1.5) {c2};
+			\node[draw,circle,fill=gray!20] (c3) at (0,1.5) {c3};
+			\node[draw,circle,fill=gray!20] (c4) at (0,3) {c4};
+			\node[draw,circle,fill=gray!20] (c5) at (0,4.5) {c5};
+			\draw[->,>=latex] (c1) to[out=90, in=-90] (c2);
+			\draw[->,>=latex] (c1) to[out=90, in=-90] (c3);
+			\draw[->,>=latex] (c3) to[out=90, in=-90] (c4);
+			\draw[->,>=latex] (c4) to[out=90, in=-90] (c5);
+			\node[draw,rectangle,fill=gray!50] (Branch) at (2,3) {Branch\_1};
+			\node[draw,rectangle,fill=gray!50] (HEAD) at (-1.5,1.5) {HEAD};
+			\node[draw,rectangle,fill=gray!50] (Master) at (1.5,4.5) {Master};
+			\draw[->,>=latex] (HEAD) to[out=0, in=180] (c3);
+			\draw[->,>=latex] (Master) to[out=180, in=0] (c5);
+			\draw[->,>=latex] (Branch) to[out=-90, in=90] (c2);
+			\end{tikzpicture}
+		\end{center}
+	\end{column}
+	\begin{column}{5cm}
+		\$ git checkout c3 \\
+		\$ git checkout Branch\_1 \\
+		\$ git checkout master \\
+		\$ git checkout master$\sim$2 \\
+	\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}
+\frametitle{Lien avec un depôt distant}
+\begin{center}
+	\begin{tikzpicture}
+	\coordinate (lu1) at (0,3);
+	\coordinate (lu2) at (4,3);
+	\coordinate (lu3) at (8,3);
+	\coordinate (lu4) at (-5,3);
+	\coordinate (rb1) at (3,0);
+	\coordinate (rb2) at (7,0);
+	\coordinate (rb3) at (11,0);
+	\coordinate (rb4) at (-2,0);
+	\fill[color=gray!20] (lu1) rectangle (rb1);
+	\draw (lu1) rectangle (rb1);
+	\draw (lu1) node[below right]{\footnotesize Depôt local};
+	\fill[color=gray!20] (lu2) rectangle (rb2);
+	\draw (lu2) rectangle (rb2);
+	\draw (lu2) node[below right]{\footnotesize Staging area};
+	\fill[color=gray!20] (lu3) rectangle (rb3);
+	\draw (lu3) rectangle (rb3);
+	\draw (lu3) node[below right]{\footnotesize Répertoire de travail};
+	\fill[color=gray!20] (lu4) rectangle (rb4);
+	\draw (lu4) rectangle (rb4);
+	\draw (lu4) node[below right]{\footnotesize Depôt distant};
+	\draw[dashed] (7.5,-2) -- (7.5,5);
+	\draw[->,>=latex] (9,0) to[bend left] (6,0);
+	\draw (3.5,-0.5) node[below]{\footnotesize git commit};
+	\draw[->,>=latex] (5,0) to[bend left] (2,0);
+	\draw (7.5,-0.5) node[below]{\footnotesize git add};
+	\draw[->,>=latex] (2,3) to[bend left] (9,3);
+	\draw (5.5,4) node[below]{\footnotesize git checkout};
+	\draw[->,>=latex] (6,3) to[bend left] (9,3);
+	\draw (7.5,3.5) node[below]{\footnotesize git reset};
+	\draw[dashed] (-1,-2) -- (-1,5);
+	\draw[->,>=latex] (1,0) to[bend left] (-3,0);
+	\draw (-1,-0.5) node[below]{\footnotesize git push};
+	\draw[->,>=latex] (-3,3) to[bend left] (1,3);
+	\draw (-1,4) node[below]{\footnotesize git fetch};
+	\draw (1.5,4.5) node[below]{\footnotesize git pull = git fetch + git checkout};
+	\draw (-1,5) node[below right]{Ordinateur local};
+	\draw (-1,5) node[below left]{Serveur distant};
+	\end{tikzpicture}	
+\end{center}
+\end{frame}
+\begin{frame}
+\frametitle{Ressources utiles}
+\begin{itemize}
+	\item Fiche mémoire git : \\
+	\url{https://github.com/UgoVollhardt/CheatSheetGit/blob/master/CheatSheet.pdf}
+	\item Tutoriel interactif Git : \\
+	\url{https://learngitbranching.js.org/}
+	\url{https://try.github.io/levels/1/challenges/1}
+\end{itemize}
+
+
+\end{frame}
+
+\end{document}\documentclass{beamer}
