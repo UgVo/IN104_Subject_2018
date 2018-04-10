@@ -76,6 +76,26 @@
 		\item {\bfseries \$ git commit -m "Description"} : Forme un commit qui contiendra l'ensemble des modification présentes dans la staging area.
 	\end{itemize}
 \end{frame}
+\begin{frame}[fragile]
+	\frametitle{Le fichier .gitignore}
+	\begin{columns}[c]
+		\begin{column}{5cm}
+			Pour un projet utilisant le langage C : \\
+			\begin{verbatim}
+			# fichiers de compilation
+			*.o
+			# Fichiers compilés
+			*.lib
+			*.a
+			*.exe
+			\end{verbatim}
+		\end{column}
+		\begin{column}{5cm}
+			Permet de spécifier à Git d'ignorer complétement ces fichiers et les modifications faites dessus. \\
+			$\Rightarrow$ Permet de ne gérer que les fichiers utiles
+		\end{column}
+	\end{columns}
+\end{frame}
 
 \begin{frame}
 \frametitle{Contenu du depôt local : Historique des commits}
@@ -277,6 +297,25 @@
 	\end{tikzpicture}	
 \end{center}
 \end{frame}
+
+\begin{frame}
+\frametitle{Interaction avec un projet distant}
+Initialisation : 
+	\begin{enumerate}
+		\item Clonage du projet sur un ordinateur local \\
+			{\bfseries \$ git clone git@github.com$\colon$user/project.git}
+	\end{enumerate}
+Utilisation : 
+	\begin{enumerate}
+		\item Récupération du contenu du serveur distant \\
+		{\bfseries \$ git pull}
+		\item Publication du contenu local sur le serveur distant \\
+		{\bfseries \$ git push}
+	\end{enumerate}
+\vskip 0.5cm
+Remarque : Privilégier l'utilisation de l'adresse SSH plutôt que HTTPS
+\end{frame}
+
 \begin{frame}
 \frametitle{Ressources utiles}
 \begin{itemize}
