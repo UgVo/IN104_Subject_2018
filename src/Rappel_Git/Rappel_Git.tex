@@ -60,7 +60,7 @@
 	\end{frame}
 
 
-\begin{frame}
+\begin{frame}[fragile]
 	\frametitle{Les Commits}
 	Contenu d'un commit : 
 	\begin{itemize}
@@ -71,9 +71,9 @@
 	\end{itemize}
 	Création d'un Commit :
 	\begin{itemize}
-		\item {\bfseries \$ git status }: Affiche le status actuel du répertoire de travail (fichiers modifiés, ajoutés ou supprimés)
-		\item {\bfseries \$ git add <file> }: Ajoute les modifications faites sur un fichier à la staging area. \\
-		\item {\bfseries \$ git commit -m "Description"} : Forme un commit qui contiendra l'ensemble des modification présentes dans la staging area.
+		\item \verb| $ git status| : Affiche le status actuel du répertoire de travail (fichiers modifiés, ajoutés ou supprimés)
+		\item \verb|$ git add <file>|: Ajoute les modifications faites sur un fichier à la staging area. \\
+		\item \verb|$ git commit -m "Description"| : Forme un commit qui contiendra l'ensemble des modification présentes dans la staging area.
 	\end{itemize}
 \end{frame}
 \begin{frame}[fragile]
@@ -298,19 +298,20 @@
 \end{center}
 \end{frame}
 
-\begin{frame}
+\begin{frame}[fragile]
 \frametitle{Interaction avec un projet distant}
 Initialisation : 
 	\begin{enumerate}
 		\item Clonage du projet sur un ordinateur local \\
-			{\bfseries \$ git clone git@github.com$\colon$user/project.git}
+			\verb|$ git clone git@[srv_url]:[user_pseudo]/[projet].git| \\
+			ex : \verb|$ git clone git@gitlab:ugo/test.git|
 	\end{enumerate}
 Utilisation : 
 	\begin{enumerate}
 		\item Récupération du contenu du serveur distant \\
-		{\bfseries \$ git pull}
+			\verb|$ git pull|
 		\item Publication du contenu local sur le serveur distant \\
-		{\bfseries \$ git push}
+			\verb|$ git push|
 	\end{enumerate}
 \vskip 0.5cm
 Remarque : Privilégier l'utilisation de l'adresse SSH plutôt que HTTPS
