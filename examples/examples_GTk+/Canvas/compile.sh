@@ -1,1 +1,1 @@
-gcc main.cpp  -o main `pkg-config --cflags --libs gtk+-3.0`
+gcc main.cpp  -o main `pkg-config --cflags --libs gtk+-2.0`
